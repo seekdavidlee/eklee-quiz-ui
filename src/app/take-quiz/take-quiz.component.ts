@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MyQuestion } from '../models/my-question';
 import { MyAnswer } from '../models/my-answer';
 import { MyAnswerChoice } from '../models/my-answer-choice';
 import { TakeQuizRepositoryService } from '../services/take-quiz-repository.service';
 import { QuizSessionQuestion } from '../models/quiz-session-question';
+import { MsAdalAngular6Service } from 'microsoft-adal-angular6';
+import { QuestionRepositoryService } from '../services/question-repository.service';
 
 @Component({
   selector: 'app-take-quiz',
@@ -15,7 +17,10 @@ export class TakeQuizComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private takeQuizService: TakeQuizRepositoryService) { }
+    private takeQuizService: TakeQuizRepositoryService,
+    private adalSvc: MsAdalAngular6Service,
+    private questionRepositoryService: QuestionRepositoryService,
+    private router: Router) { }
 
   answers: MyAnswer[];
   showResult: boolean;
@@ -27,17 +32,13 @@ export class TakeQuizComponent implements OnInit {
     return this.route.snapshot.paramMap.get('id');
   }
 
+  private isLoggedIn(): boolean {
+    return this.adalSvc.userInfo && this.adalSvc.userInfo != null;
+  }
+
   sessionIndex: number = 0;
 
-  transform(question: QuizSessionQuestion): MyAnswer {
-    let answer = new MyAnswer();
-    answer.question = new MyQuestion();
-    answer.question.id = question.id;
-    answer.question.text = question.text;
-    answer.question.choices = JSON.parse(question.choicesJson);
-    answer.question.explain = JSON.parse(question.explainJson);
-    answer.question.tags = JSON.parse(question.tagsJson);
-
+  private populateAnswers(answer: MyAnswer): void {
     answer.answers = answer.question.choices.sort(x => x.order).map((x, index) => {
 
       let c = new MyAnswerChoice();
@@ -46,9 +47,29 @@ export class TakeQuizComponent implements OnInit {
       c.id = index;
       return c;
     });
+  }
 
+  private transformQuizSessionQuestion(question: QuizSessionQuestion): MyAnswer {
+    let answer = new MyAnswer();
+    answer.question = new MyQuestion();
+    answer.question.id = question.id;
+    answer.question.text = question.text;
+    answer.question.choices = JSON.parse(question.choicesJson);
+    answer.question.explain = JSON.parse(question.explainJson);
+    answer.question.tags = JSON.parse(question.tagsJson);
+
+    this.populateAnswers(answer);
     return answer;
   }
+
+  private transformMyQuestion(question: MyQuestion): MyAnswer {
+    let answer = new MyAnswer();
+    answer.question = question;
+    this.populateAnswers(answer);
+    return answer;
+  }
+
+
 
   disableNext(): boolean {
     return this.sessionIndex === (this.answers.length - 1);
@@ -104,12 +125,27 @@ export class TakeQuizComponent implements OnInit {
     this.reload();
   }
 
-  reload(): void {
+  private errorHandler = (err: any) => {
+    alert(err);
+  };
+
+  private secureReload(): void {
+    this.questionRepositoryService.list(this.getId()).subscribe(quiz => {
+      this.name = localStorage.getItem("quizName");
+      this.answers = quiz.map(q => this.transformMyQuestion(q));
+      if (this.answers.length == 0) {
+        alert("Nothing to show because we don't have any questions.");
+        this.router.navigateByUrl("/");
+      }
+    }, this.errorHandler);
+  }
+
+  private publicReload(): void {
     this.takeQuizService.get(this.getId()).subscribe(quizSession => {
 
       if (quizSession != null) {
         this.name = quizSession.name;
-        this.answers = quizSession.questions.map(this.transform);
+        this.answers = quizSession.questions.map(q => this.transformQuizSessionQuestion(q));
 
         if (this.answers.length === 0) {
           alert("Nothing to show because we don't have any questions.");
@@ -117,11 +153,16 @@ export class TakeQuizComponent implements OnInit {
       } else {
         this.name = "Sorry, quiz does not exist."
       }
+    }, this.errorHandler);
+  }
 
+  reload(): void {
 
-    }, err => {
-      alert(err);
-    });
+    if (this.isLoggedIn()) {
+      this.secureReload();
+    } else {
+      this.publicReload();
+    }
   }
 
   ngOnInit() {

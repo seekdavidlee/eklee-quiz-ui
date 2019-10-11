@@ -22,11 +22,13 @@ export class DashboardComponent implements OnInit {
     this.quizService.list().subscribe(list => {
       this.quizes = list;
     }, err => {
+      this.logger.log(err);
       alert(err);
     });
   }
 
   start(quiz: MyQuiz): void {
+    localStorage.setItem("quizName", quiz.name);
     this.router.navigateByUrl("/take/quiz/" + quiz.id);
   }
 }
