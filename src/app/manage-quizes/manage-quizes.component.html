@@ -1,0 +1,62 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">All Quizes</h1>
+        <h2 class="subtitle">
+            Here are a list of quizes you have created.
+        </h2>
+
+        <table class="table is-striped">
+            <thead>
+                <tr>
+                    <th><abbr title="Name">Name</abbr></th>
+                    <th colspan="2">
+                        <div style="text-align: right">
+                            <a class="button" (click)="showAddQuiz = true">Add quiz</a>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let quiz of quizes">
+                    <td> <a class="card-footer-item" routerLink="/questions/{{quiz.id}}">{{quiz.name}}</a> </td>
+                    <td> <a class="card-footer-item" (click)="edit(quiz)">Edit</a>
+                    </td>
+                    <td>
+                        <a class="card-footer-item" (click)="remove(quiz)">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<div class="modal" [ngClass]="{'is-active': showAddQuiz===true}">
+    <div class="modal-background"></div>
+
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Add Quiz</p>
+            <button class="delete" aria-label="close" (click)="showAddQuiz = false"></button>
+        </header>
+        <section class="modal-card-body">
+
+            <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                    <input [(ngModel)]="quiz.name" class="input" type="text" placeholder="e.g AZ 300">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Is Public</label>
+                <div class="control">
+                    <input type="checkbox" [(ngModel)]="quiz.isPublic">
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" [ngClass]="{'is-loading': isSaving === true}" (click)="saveChanges()">Save
+                changes</button>
+            <button class="button" (click)="showAddQuiz = false">Cancel</button>
+        </footer>
+    </div>
+</div>

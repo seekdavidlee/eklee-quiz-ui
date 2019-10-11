@@ -1,0 +1,76 @@
+<section class="section">
+    <div class="title is-4">{{name}}</div>
+    <div *ngIf="answers" class="container">
+        <h1 class="title">{{answers[sessionIndex].question.text}} </h1>
+        <h2 class="subtitle">
+            Question {{sessionIndex + 1}} of {{answers.length}}
+        </h2>
+        <div class="content" *ngIf="multipleAnswers()">
+            <div class="control">
+                <div *ngFor="let answer of answers[sessionIndex].answers">
+                    <label class="checkbox">
+                        <input type="checkbox" [(ngModel)]="answer.selected">
+                        <span class="title is-4"> {{answer.text}}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="content" *ngIf="multipleAnswers()===false">
+            <div class="control">
+                <div *ngFor="let answer of answers[sessionIndex].answers">
+                    <label class="radio">
+                        <input type="radio" name="answers" (change)="onChange(answer,answers[sessionIndex])"
+                            [checked]="answer.selected">
+                        <span class="title is-4"> {{answer.text}}</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <nav class="level">
+            <!-- Left side -->
+            <div class="level-left">
+                <div class="level-item">
+                    <button [disabled]="disableBack()" class="button is-info is-large is-fullwidt"
+                        (click)="back()">Back</button>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="level-item">
+                    <button [disabled]="disableNext()" class="button is-info is-large is-fullwidt"
+                        (click)="next()">Next</button>
+                </div>
+                <div class="level-item">
+                    <button [disabled]="disableEnd()" class="button is-danger is-large is-fullwidt" (click)="end()">End
+                        Quiz</button>
+                </div>
+            </div>
+        </nav>
+    </div>
+</section>
+
+<div class="modal" [ngClass]="{'is-active': showResult===true}">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Score</p>
+            <button class="delete" aria-label="close" (click)="close()"></button>
+        </header>
+        <section class="modal-card-body">
+            <table class="table is-striped" *ngIf="answers">
+
+                <tbody>
+                    <tr>
+                        <td>Score:</td>
+                        <td>{{score}} of {{ answers.length }}</td>
+                    </tr>
+                    <tr>
+                        <td>Score %:</td>
+                        <td>{{scorePercentage | percent}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>

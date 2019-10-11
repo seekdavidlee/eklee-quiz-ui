@@ -1,0 +1,13 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title">My Dashboard</h1>
+        <h2 class="subtitle">
+            Manage your personal quizes here. Click on a quiz to start.
+        </h2>
+        <div class="content">
+                <div class="buttons">
+                        <span *ngFor="let quiz of quizes" (click)="start(quiz)" class="button">{{quiz.name}}</span>
+                </div>
+        </div>
+    </div>
+</section>

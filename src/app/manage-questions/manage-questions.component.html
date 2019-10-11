@@ -1,0 +1,102 @@
+<section class="section">
+    <div class="container">
+        <h1 class="title"></h1>
+        <h2 class="subtitle">
+            Here are a list of questions you have created.
+        </h2>
+
+        <table class="table is-striped">
+            <thead>
+                <tr>
+                    <th><abbr title="Text">Question</abbr></th>
+                    <th><abbr title="Text">Choices</abbr></th>
+                    <th><abbr title="Text">Explain</abbr></th>
+                    <th colspan="2">
+                        <div style="text-align: right">
+                            <a class="button" (click)="add()">Add question</a>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let question of questions">
+                    <td> {{question.text}} </td>
+                    <td> {{question.choices.length}} </td>
+                    <td> {{question.explain.text}} </td>
+                    <td> <a class="card-footer-item" (click)="edit(question)">Edit</a>
+                    </td>
+                    <td>
+                        <a class="card-footer-item" (click)="remove(question)">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<div class="modal" [ngClass]="{'is-active': showAdd===true}">
+    <div class="modal-background"></div>
+
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Add Question</p>
+            <button class="delete" aria-label="close" (click)="showAdd = false"></button>
+        </header>
+        <section class="modal-card-body">
+
+            <div class="field">
+                <label class="label">Question</label>
+                <div class="control">
+                    <textarea [className]="'textarea'" [(ngModel)]="question.text" class="input" rows="5"
+                        placeholder="e.g What is 1 + 1"></textarea>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Explain</label>
+                <div class="control">
+                    <textarea [className]="'textarea'" [(ngModel)]="question.explain.text" class="input" rows="2"
+                        placeholder="e.g Explain answers to the choice(s)"></textarea>
+                </div>
+            </div>
+
+            <table class="table is-striped">
+                <thead>
+                    <tr>
+                        <td colspan="3">
+                            <button class="button is-info" (click)="addChoice(question)">Add Choice</button>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let choice of question.choices">
+                        <td>
+                            <div class="field">
+                                <label class="label">Choice</label>
+                                <div class="control">
+                                    <input class="input" [(ngModel)]="choice.text" type="text" />
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="field">
+                                <label class="label">Answer</label>
+                                <div class="control">
+                                    <input type="checkbox" [(ngModel)]="choice.isAnswer" />
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="button is-danger" (click)="removeChoice(question, choice)">Remove</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" [ngClass]="{'is-loading': isSaving === true}" (click)="saveChanges()">Save
+                changes</button>
+            <button class="button" (click)="showAdd = false">Cancel</button>
+        </footer>
+    </div>
+</div>
