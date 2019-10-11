@@ -8,6 +8,13 @@ import { QuizSessionQuestion } from '../models/quiz-session-question';
 import { MsAdalAngular6Service } from 'microsoft-adal-angular6';
 import { QuestionRepositoryService } from '../services/question-repository.service';
 
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 @Component({
   selector: 'app-take-quiz',
   templateUrl: './take-quiz.component.html',
@@ -47,6 +54,8 @@ export class TakeQuizComponent implements OnInit {
       c.id = index;
       return c;
     });
+
+    shuffleArray(answer.answers);
   }
 
   private transformQuizSessionQuestion(question: QuizSessionQuestion): MyAnswer {
@@ -136,7 +145,11 @@ export class TakeQuizComponent implements OnInit {
       if (this.answers.length == 0) {
         alert("Nothing to show because we don't have any questions.");
         this.router.navigateByUrl("/");
+        return;
       }
+
+      shuffleArray(this.answers);
+
     }, this.errorHandler);
   }
 
@@ -149,10 +162,15 @@ export class TakeQuizComponent implements OnInit {
 
         if (this.answers.length === 0) {
           alert("Nothing to show because we don't have any questions.");
+          return;
         }
       } else {
         this.name = "Sorry, quiz does not exist."
+        return;
       }
+
+      shuffleArray(this.answers);
+
     }, this.errorHandler);
   }
 
