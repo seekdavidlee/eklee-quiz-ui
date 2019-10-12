@@ -137,7 +137,7 @@ export class TakeQuizComponent implements OnInit {
 
   shouldShowAnswerAsWrong(myAns: MyAnswerChoice, myAnswers: MyAnswerChoice[]): boolean {
 
-    if (myAnswers) {
+    if (myAnswers && myAnswers != null) {
       var isCheckBox = myAnswers.filter(x => x.isAnswer).length > 1;
       if (isCheckBox) {
         return this.isReviewMode() && myAns.isAnswer === false && myAns.selected === true;

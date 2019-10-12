@@ -21,7 +21,7 @@
             <div class="control" *ngIf="multipleAnswers()===false">
                 <div *ngFor="let answer of answers[sessionIndex].answers">
                     <div class="box"
-                        [ngClass]="{'has-background-success': isReviewMode() && answer.isAnswer,'has-background-danger': shouldShowAnswerAsWrong(answer)}">
+                        [ngClass]="{'has-background-success': isReviewMode() && answer.isAnswer,'has-background-danger': shouldShowAnswerAsWrong(answer, null)}">
                         <label class="radio">
                             <input type="radio" name="answers" (change)="onChange(answer,answers[sessionIndex])"
                                 [checked]="answer.selected">
