@@ -84,22 +84,38 @@ export class TakeQuizComponent implements OnInit {
     return this.sessionIndex === (this.answers.length - 1);
   }
 
+  _answer: MyAnswerChoice = null;
+  _myAnswer: MyAnswer = null;
+
   onChange(answer: MyAnswerChoice, myAnswer: MyAnswer): void {
-    for (var i = 0; i < myAnswer.answers.length; i++) {
-      var c = myAnswer.answers[i];
-      c.selected = i === answer.id;
-    }
+
+    this._answer = answer;
+    this._myAnswer = myAnswer;
   }
 
   disableBack(): boolean {
     return this.sessionIndex === 0;
   }
 
+  setAnswer(): void {
+    if (this._answer !== null) {
+      for (var i = 0; i < this._myAnswer.answers.length; i++) {
+        var c = this._myAnswer.answers[i];
+        c.selected = false;
+      }
+      this._answer.selected = true;
+      this._myAnswer = null;
+      this._answer = null;
+    }
+  }
+
   next(): void {
+    this.setAnswer();
     this.sessionIndex += 1;
   }
 
   back(): void {
+    this.setAnswer();
     this.sessionIndex -= 1;
   }
 

@@ -9,9 +9,9 @@
             <div class="control">
                 <div *ngFor="let answer of answers[sessionIndex].answers">
                     <label class="checkbox">
-                        <input type="checkbox" [(ngModel)]="answer.selected">
-                        <span class="title is-4"> {{answer.text}}</span>
+                        <input type="checkbox" [(ngModel)]="answer.selected">                        
                     </label>
+                    <span class="title is-5"> {{answer.text}}</span>
                 </div>
             </div>
         </div>
@@ -22,8 +22,8 @@
                     <label class="radio">
                         <input type="radio" name="answers" (change)="onChange(answer,answers[sessionIndex])"
                             [checked]="answer.selected">
-                        <span class="title is-4"> {{answer.text}}</span>
                     </label>
+                    <span class="title is-5"> {{answer.text}}</span>
                 </div>
             </div>
         </div>
