@@ -5,49 +5,72 @@
         <h2 class="subtitle">
             Question {{sessionIndex + 1}} of {{answers.length}}
         </h2>
-        <div class="content" *ngIf="multipleAnswers()">
-            <div class="control">
+
+        <div class="content">
+            <div class="control" *ngIf="multipleAnswers()">
                 <div *ngFor="let answer of answers[sessionIndex].answers">
-                    <label class="checkbox">
-                        <input type="checkbox" [(ngModel)]="answer.selected">                        
-                    </label>
-                    <span class="title is-5"> {{answer.text}}</span>
+                    <div class="box"
+                        [ngClass]="{'has-background-success':shouldShowAnswerAsRight(answer),'has-background-danger': shouldShowAnswerAsWrong(answer, answers[sessionIndex].answers)}">
+                        <label class="checkbox">
+                            <input type="checkbox" [(ngModel)]="answer.selected">
+                        </label>
+                        <span class="title is-5"> {{answer.text}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control" *ngIf="multipleAnswers()===false">
+                <div *ngFor="let answer of answers[sessionIndex].answers">
+                    <div class="box"
+                        [ngClass]="{'has-background-success': isReviewMode() && answer.isAnswer,'has-background-danger': shouldShowAnswerAsWrong(answer)}">
+                        <label class="radio">
+                            <input type="radio" name="answers" (change)="onChange(answer,answers[sessionIndex])"
+                                [checked]="answer.selected">
+                        </label>
+                        <span class="title is-5"> {{answer.text}}</span>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="content" *ngIf="multipleAnswers()===false">
-            <div class="control">
-                <div *ngFor="let answer of answers[sessionIndex].answers">
-                    <label class="radio">
-                        <input type="radio" name="answers" (change)="onChange(answer,answers[sessionIndex])"
-                            [checked]="answer.selected">
-                    </label>
-                    <span class="title is-5"> {{answer.text}}</span>
-                </div>
-            </div>
-        </div>
-
-        <nav class="level">
-            <!-- Left side -->
-            <div class="level-left">
-                <div class="level-item">
-                    <button [disabled]="disableBack()" class="button is-info is-large is-fullwidt"
-                        (click)="back()">Back</button>
-                </div>
-            </div>
-            <div class="level-right">
-                <div class="level-item">
-                    <button [disabled]="disableNext()" class="button is-info is-large is-fullwidt"
-                        (click)="next()">Next</button>
-                </div>
-                <div class="level-item">
-                    <button [disabled]="disableEnd()" class="button is-danger is-large is-fullwidt" (click)="end()">End
-                        Quiz</button>
-                </div>
-            </div>
-        </nav>
     </div>
+
+    <div *ngIf="reviewMode" class="box has-background-success">
+        <h2 class="title is-4">
+            Explanation:
+        </h2>
+        <div class="content">
+            <span>{{answers[sessionIndex].question.explain.text}}</span>
+        </div>
+    </div>
+
+    <nav class="level">
+        <!-- Left side -->
+        <div class="level-left">
+            <div class="level-item">
+                <button [disabled]="disableBack()" class="button is-info is-large is-fullwidth"
+                    (click)="back()">Back</button>
+            </div>
+
+            <div *ngIf="reviewMode === false" class="level-item">
+                <button class="button is-info is-large is-fullwidth" (click)="enableReviewMode()">Review</button>
+            </div>
+
+            <div *ngIf="reviewMode === true" class="level-item">
+                <button class="button is-danger is-large is-fullwidth" (click)="disableReviewMode()">Disable
+                    Review</button>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <button [disabled]="disableNext()" class="button is-info is-large is-fullwidth"
+                    (click)="next()">Next</button>
+            </div>
+            <div class="level-item">
+                <button [disabled]="disableEnd()" class="button is-danger is-large is-fullwidth" (click)="end()">End
+                    Quiz</button>
+            </div>
+        </div>
+    </nav>
+
 </section>
 
 <div class="modal" [ngClass]="{'is-active': showResult===true}">
@@ -59,7 +82,6 @@
         </header>
         <section class="modal-card-body">
             <table class="table is-striped" *ngIf="answers">
-
                 <tbody>
                     <tr>
                         <td>Score:</td>
@@ -71,6 +93,16 @@
                     </tr>
                 </tbody>
             </table>
+            <nav class="level">
+                <div class="level-left"></div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <button class="button is-primary is-large is-fullwidth" (click)="close()">Restart</button>
+                    </div>
+                    <div class="level-item"><button class="button is-info is-large is-fullwidth"
+                            (click)="closeAndEnableReviewMode()">Review</button></div>
+                </div>
+            </nav>
         </section>
     </div>
 </div>

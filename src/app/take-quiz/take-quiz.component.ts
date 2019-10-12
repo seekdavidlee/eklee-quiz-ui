@@ -34,6 +34,7 @@ export class TakeQuizComponent implements OnInit {
   score: number;
   scorePercentage: number;
   name: string;
+  reviewMode: boolean = false;
 
   getId(): string {
     return this.route.snapshot.paramMap.get('id');
@@ -52,6 +53,7 @@ export class TakeQuizComponent implements OnInit {
       c.text = x.text;
       c.selected = false;
       c.id = index;
+      c.isAnswer = x.isAnswer === true;
       return c;
     });
 
@@ -78,10 +80,8 @@ export class TakeQuizComponent implements OnInit {
     return answer;
   }
 
-
-
   disableNext(): boolean {
-    return this.sessionIndex === (this.answers.length - 1);
+    return this.answers && this.sessionIndex === (this.answers.length - 1);
   }
 
   _answer: MyAnswerChoice = null;
@@ -120,22 +120,42 @@ export class TakeQuizComponent implements OnInit {
   }
 
   disableEnd(): boolean {
-    return this.sessionIndex < (this.answers.length - 1);
+    return this.reviewMode === false && this.answers && this.sessionIndex < (this.answers.length - 1);
   }
 
   multipleAnswers(): boolean {
     return this.answers[this.sessionIndex].question.choices.filter(c => c.isAnswer).length > 1;
   }
 
+  isReviewMode(): boolean {
+    return this.reviewMode;
+  }
+
+  shouldShowAnswerAsRight(myAns: MyAnswerChoice): boolean {
+    return this.isReviewMode() && myAns.isAnswer === true;
+  }
+
+  shouldShowAnswerAsWrong(myAns: MyAnswerChoice, myAnswers: MyAnswerChoice[]): boolean {
+
+    if (myAnswers) {
+      var isCheckBox = myAnswers.filter(x => x.isAnswer).length > 1;
+      if (isCheckBox) {
+        return this.isReviewMode() && myAns.isAnswer === false && myAns.selected === true;
+      }
+    }
+
+    return this.isReviewMode() && myAns.isAnswer === false && myAns.selected === true;
+  }
+
   end(): void {
 
     this.score = this.answers.filter(x => {
 
-      var rightChoices = x.question.choices.filter((y, idx) =>
-        y.isAnswer && x.answers[idx].selected ||
-        !y.isAnswer && !x.answers[idx].selected).length;
+      var rightAnswers = x.answers.filter((a) => {
+        return a.isAnswer === a.selected;
+      }).length;
 
-      return rightChoices === x.answers.length;
+      return rightAnswers === x.answers.length
     }).length;
 
     this.scorePercentage = this.score / this.answers.length;
@@ -144,7 +164,14 @@ export class TakeQuizComponent implements OnInit {
 
   }
 
+  closeAndEnableReviewMode(): void {
+    this.showResult = false;
+    this.sessionIndex = 0;
+    this.reviewMode = true;
+  }
+
   close(): void {
+    this.reviewMode = false;
     this.showResult = false;
     this.sessionIndex = 0;
     this.reload();
@@ -197,6 +224,14 @@ export class TakeQuizComponent implements OnInit {
     } else {
       this.publicReload();
     }
+  }
+
+  enableReviewMode(): void {
+    this.reviewMode = true;
+  }
+
+  disableReviewMode(): void {
+    this.reviewMode = false;
   }
 
   ngOnInit() {
