@@ -50,3 +50,4 @@ Thumbs.db
 /.vs/slnx.sqlite
 *.config
 *.suo
+/.vs/VSWorkspaceState.json
