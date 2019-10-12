@@ -48,3 +48,5 @@ Thumbs.db
 /src/environments
 /package-lock.json
 /.vs/slnx.sqlite
+*.config
+*.suo
