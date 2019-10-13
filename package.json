@@ -21,6 +21,7 @@
     "@angular/router": "~8.2.8",
     "bulma": "^0.7.5",
     "microsoft-adal-angular6": "^1.3.0",
+    "ngx-spinner": "^8.0.3",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
