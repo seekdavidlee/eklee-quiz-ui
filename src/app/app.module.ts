@@ -12,6 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ManageQuestionsComponent } from './manage-questions/manage-questions.component';
 import { TakeQuizComponent } from './take-quiz/take-quiz.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { TakeQuizComponent } from './take-quiz/take-quiz.component';
     AppRoutingModule,
     MsAdalAngular6Module.forRoot(environment.adalConfig),
     HttpClientModule,
-    FormsModule
+    FormsModule, 
+    NgxSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

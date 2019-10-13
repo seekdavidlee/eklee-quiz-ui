@@ -7,6 +7,7 @@ import { GraphQLInput } from '../models/graph-qlinput';
 import { GraphQLResponse } from '../models/graph-qlresponse';
 import { GraphQLError } from '../models/graph-qlerror';
 import { LoggingService } from './logging.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Injectable({
   providedIn: 'root'
 })
@@ -15,20 +16,28 @@ export class HttpGraphQLService {
   constructor(
     private http: HttpClient,
     private adalSvc: MsAdalAngular6Service,
-    private logging: LoggingService) { }
+    private logging: LoggingService,
+    private spinner: NgxSpinnerService) { }
 
   postAsync<TOutput>(typeName: string, graphInput: GraphQLInput, disableAdal: boolean = false): Observable<TOutput> {
+
+    this.spinner.show();
 
     this.logging.log("postAsync: " + typeName);
 
     return new Observable<TOutput>((observable) => {
 
       var handleError = (err: any) => {
+
+        this.spinner.hide();
+        
         this.logging.log(err);
         observable.error(err);
       };
 
       var handleSuccess = (result: GraphQLResponse) => {
+
+        this.spinner.hide();
 
         if (result.errors) {
           if (result.errors.length > 0) {
