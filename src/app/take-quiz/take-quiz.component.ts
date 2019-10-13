@@ -7,6 +7,9 @@ import { TakeQuizRepositoryService } from '../services/take-quiz-repository.serv
 import { QuizSessionQuestion } from '../models/quiz-session-question';
 import { MsAdalAngular6Service } from 'microsoft-adal-angular6';
 import { QuestionRepositoryService } from '../services/question-repository.service';
+import { MyTag } from '../models/my-tag';
+
+const QUIZ_FILTER_TAG: string = "QuizFilterTag";
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -30,11 +33,31 @@ export class TakeQuizComponent implements OnInit {
     private router: Router) { }
 
   answers: MyAnswer[];
+  starterAnswers: MyAnswer[];
+  starterQuizTags: string[];
   showResult: boolean;
   score: number;
   scorePercentage: number;
   name: string;
   reviewMode: boolean = false;
+  showStarter: boolean = false;
+
+  loadQuestions(filter: string): void {
+    this.showStarter = false;
+
+    this.answers = filter !== null ? this.starterAnswers.filter(x => {
+
+      let item = this.getQuizFilterTag(x.question);
+      if (item !== null) {
+        let labels = item.value.split(",");
+        return labels.filter(label => label === filter).length === 1;
+      }
+
+      return false;
+    }) : this.starterAnswers;
+
+    shuffleArray(this.answers);
+  }
 
   getId(): string {
     return this.route.snapshot.paramMap.get('id');
@@ -149,6 +172,8 @@ export class TakeQuizComponent implements OnInit {
 
   end(): void {
 
+    this.setAnswer();
+    
     this.score = this.answers.filter(x => {
 
       var rightAnswers = x.answers.filter((a) => {
@@ -184,16 +209,50 @@ export class TakeQuizComponent implements OnInit {
   private secureReload(): void {
     this.questionRepositoryService.list(this.getId()).subscribe(quiz => {
       this.name = localStorage.getItem("quizName");
-      this.answers = quiz.map(q => this.transformMyQuestion(q));
-      if (this.answers.length == 0) {
+
+      let answers = quiz.map(q => this.transformMyQuestion(q));
+      if (answers.length == 0) {
         alert("Nothing to show because we don't have any questions.");
         this.router.navigateByUrl("/");
         return;
       }
 
-      shuffleArray(this.answers);
-
+      this.loadAnswers(answers);
     }, this.errorHandler);
+  }
+
+  private AddIfNotExist(label: string): void {
+    var found = this.starterQuizTags.filter(x => x === label);
+    if (found.length === 0) {
+      this.starterQuizTags.push(label);
+    }
+  }
+
+  private getQuizFilterTag(question: MyQuestion): MyTag {
+    let existing = question.tags.filter(x => x.key === QUIZ_FILTER_TAG);
+    if (existing.length === 1) {
+      let item = existing[0];
+      return item;
+    }
+
+    return null;
+  }
+
+  private loadAnswers(answers: MyAnswer[]) {
+
+    this.starterAnswers = answers;
+    this.starterQuizTags = [];
+    this.starterAnswers.forEach(x => {
+
+      let item = this.getQuizFilterTag(x.question);
+      if (item !== null) {
+        item.value.split(",").forEach(label => {
+          this.AddIfNotExist(label);
+        });
+      }
+    });
+
+    this.showStarter = true;
   }
 
   private publicReload(): void {
@@ -201,18 +260,19 @@ export class TakeQuizComponent implements OnInit {
 
       if (quizSession != null) {
         this.name = quizSession.name;
-        this.answers = quizSession.questions.map(q => this.transformQuizSessionQuestion(q));
+        let answers = quizSession.questions.map(q => this.transformQuizSessionQuestion(q));
 
-        if (this.answers.length === 0) {
+        if (answers.length === 0) {
           alert("Nothing to show because we don't have any questions.");
           return;
         }
+
+        this.loadAnswers(answers);
+
       } else {
         this.name = "Sorry, quiz does not exist."
         return;
       }
-
-      shuffleArray(this.answers);
 
     }, this.errorHandler);
   }

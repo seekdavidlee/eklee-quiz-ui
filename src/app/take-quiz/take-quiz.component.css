@@ -1,7 +1,11 @@
-.control > div{
+.control>div {
     margin-bottom: 30px;
 }
 
-.subtitle{
+.subtitle {
     margin-top: 10px !important;
+}
+
+.button-space {
+    margin-right: 10px;
 }

@@ -9,6 +9,8 @@ export class MyQuestion {
     explain: ExplainMyChoice;
     tags: MyTag[];
     quizId: string;
+    selected: boolean;
+    quizFilterTags: string[];
 }
 
 
