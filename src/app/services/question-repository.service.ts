@@ -11,7 +11,7 @@ import { QueryParameter, Comparison } from '../models/query-parameter';
 import { Status } from '../models/status';
 import { DeleteQuestion } from '../models/delete-question';
 
-const CREATE_QUESTION_NAME: string = "createOrUpdateQuestion";
+const CREATE_OR_UPDATE_QUESTION_NAME: string = "createOrUpdateQuestion";
 const GET_MY_QUESTIONS: string = "getMyQuestions";
 const DELETE_QUESTION: string = "deleteQuestion";
 
@@ -50,12 +50,12 @@ export class QuestionRepositoryService {
     return myQuestion;
   }
 
-  add(myQuestion: MyQuestion): Observable<MyQuestion> {
+  addOrUpdate(myQuestion: MyQuestion): Observable<MyQuestion> {
     let input = new GraphQLInput();
 
     input.operationName = "";
 
-    input.query = this.graphqlTemplateService.convertToMutation(CREATE_QUESTION_NAME,
+    input.query = this.graphqlTemplateService.convertToMutation(CREATE_OR_UPDATE_QUESTION_NAME,
       this.transformToQuestion(myQuestion), "question", null);
 
     input.variables = {};
@@ -67,7 +67,7 @@ export class QuestionRepositoryService {
         observable.error(err);
       };
 
-      this.http.postAsync<Question>(CREATE_QUESTION_NAME, input).subscribe(question => {
+      this.http.postAsync<Question>(CREATE_OR_UPDATE_QUESTION_NAME, input).subscribe(question => {
 
         observable.next(this.transformToMyQuestion(question));
         observable.complete();

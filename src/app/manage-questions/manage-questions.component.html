@@ -8,21 +8,34 @@
         <table class="table is-striped">
             <thead>
                 <tr>
+                    <th></th>
                     <th><abbr title="Text">Question</abbr></th>
                     <th><abbr title="Text">Choices</abbr></th>
                     <th><abbr title="Text">Explain</abbr></th>
+                    <th><abbr title="Text">Tag(s)</abbr></th>
                     <th colspan="2">
                         <div style="text-align: right">
-                            <a class="button" (click)="add()">Add question</a>
+                            <a class="button" (click)="add()" style="margin-right: 10px">Add question</a>
+                            <a class="button" (click)="applyTags()">Apply Tag</a>
                         </div>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let question of questions">
+                    <td> <label class="checkbox">
+                            <input type="checkbox" [(ngModel)]="question.selected">
+                        </label>
+                    </td>
                     <td> {{question.text}} </td>
                     <td> {{question.choices.length}} </td>
                     <td> {{question.explain.text}} </td>
+                    <td>
+                        <span *ngFor="let label of question.quizFilterTags" class="tag is-info">
+                            {{label}}
+                            <button class="delete is-small" (click)="removeTag(label,question)"></button>
+                        </span>
+                    </td>
                     <td> <a class="card-footer-item" (click)="edit(question)">Edit</a>
                     </td>
                     <td>
@@ -33,6 +46,34 @@
         </table>
     </div>
 </section>
+
+<div class="modal" [ngClass]="{'is-active': showAddTags===true}">
+    <div class="modal-background"></div>
+
+    <div class="modal-card model-card-small">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Add Tag</p>
+            <button class="delete" aria-label="close" (click)="showAddTags = false"></button>
+        </header>
+
+        <section class="modal-card-body">
+
+            <div class="field">
+                <div class="control">
+                    <input [(ngModel)]="tagValue" class="input" type="text" placeholder="Text input">
+                </div>
+            </div>
+        </section>
+
+        <footer class="modal-card-foot">
+            <button class="button is-success" [ngClass]="{'is-loading': isSaving === true}"
+                (click)="saveTagChanges()">Save
+                changes</button>
+            <button class="button" (click)="showAddTags = false">Cancel</button>
+        </footer>
+    </div>
+</div>
+
 <div class="modal" [ngClass]="{'is-active': showAdd===true}">
     <div class="modal-background"></div>
 
