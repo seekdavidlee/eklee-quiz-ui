@@ -110,7 +110,7 @@ export class QuestionRepositoryService {
     let deleteQuestion = new DeleteQuestion();
     deleteQuestion.id = myQuestion.id;
     deleteQuestion.owner = this.adalSvc.userInfo.userName;
-
+    deleteQuestion.quizId = myQuestion.quizId;
     let input = new GraphQLInput();
 
     input.operationName = "";
