@@ -1,10 +1,17 @@
 <section class="section">
     <div class="container">
         <h1 class="title"></h1>
-        <h2 class="subtitle">
-            Here are a list of questions you have created.
+        <h2 *ngIf="questions" class="subtitle">
+            Here are a list of <b>{{questions.length}}</b> question(s) you have created.
         </h2>
-
+        <div class="level">
+            <div class="level-left">
+            </div>
+            <div class="level-right">
+                <a class="level-item button is-info" (click)="add()">Add question</a>
+                <a class="level-item button is-info" (click)="applyTags()">Apply Tag</a>
+            </div>
+        </div>
         <table class="table is-striped">
             <thead>
                 <tr>
@@ -13,12 +20,7 @@
                     <th><abbr title="Text">Choices</abbr></th>
                     <th><abbr title="Text">Explain</abbr></th>
                     <th><abbr title="Text">Tag(s)</abbr></th>
-                    <th colspan="2">
-                        <div style="text-align: right">
-                            <a class="button" (click)="add()" style="margin-right: 10px">Add question</a>
-                            <a class="button" (click)="applyTags()">Apply Tag</a>
-                        </div>
-                    </th>
+                    <th colspan="2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -99,7 +101,6 @@
                         placeholder="e.g Explain answers to the choice(s)"></textarea>
                 </div>
             </div>
-
             <table class="table is-striped">
                 <thead>
                     <tr>
@@ -132,12 +133,28 @@
                     </tr>
                 </tbody>
             </table>
-
+            <div class="field is-horizontal">
+                <div class="control" *ngIf="quizTags && quizTags.length> 0">
+                    <div class="select">
+                        <select id="selectedTag" (change)="addQuestionTag($event.target.value, true)">
+                            <option *ngFor="let label of quizTags" [ngValue]="label">{{label}}</option>
+                        </select>
+                    </div>
+                </div>
+                <label id="or-label" class="label"> &nbsp;OR&nbsp; </label>
+                <input id="question-tag-text" class="input" [(ngModel)]="questionTagText" type="text" />
+                <button class="button is-info button-tag" (click)="addQuestionTag(questionTagText, false)">Add
+                    Tag</button>
+                <span *ngFor="let label of question.quizFilterTags" class="tag is-info">
+                    {{label}}
+                    <button class="delete is-small" (click)="removeQuestionTag(label,question)"></button>
+                </span>
+            </div>
         </section>
         <footer class="modal-card-foot">
             <button class="button is-success" [ngClass]="{'is-loading': isSaving === true}" (click)="saveChanges()">Save
                 changes</button>
-            <button class="button" (click)="showAdd = false">Cancel</button>
+            <button class="button" (click)="cancel()">Cancel</button>
         </footer>
     </div>
 </div>

@@ -9,6 +9,7 @@ import { MyTag } from '../models/my-tag';
 import { forkJoin } from 'rxjs';
 
 const QUIZ_FILTER_TAG: string = "QuizFilterTag";
+const SELECTED_TAG: string = "Select tag";
 
 @Component({
   selector: 'app-manage-questions',
@@ -27,10 +28,20 @@ export class ManageQuestionsComponent implements OnInit {
   question: MyQuestion;
   questions: MyQuestion[];
   showAddTags: boolean;
+  questionTagText: string;
+  quizTags: string[];
 
   ngOnInit() {
+
     this.newQuestion();
     this.reload();
+  }
+
+  private AddIfNotExist(label: string): void {
+    var found = this.quizTags.filter(x => x === label);
+    if (found.length === 0) {
+      this.quizTags.push(label);
+    }
   }
 
   add(): void {
@@ -40,6 +51,7 @@ export class ManageQuestionsComponent implements OnInit {
 
   newQuestion(): void {
     this.question = new MyQuestion();
+    this.question.quizFilterTags = [];
     this.question.id = "@";
     this.question.explain = new ExplainMyChoice();
     this.question.quizId = this.getId();
@@ -64,10 +76,18 @@ export class ManageQuestionsComponent implements OnInit {
   }
 
   reload(): void {
+
+    this.quizTags = [SELECTED_TAG];
+
     this.questionService.list(this.getId()).subscribe(list => {
 
       list.forEach(item => {
         this.loadQuizFilterTag(item);
+
+        if (item.quizFilterTags && item.quizFilterTags.length > 0) {
+          item.quizFilterTags.forEach(label => this.AddIfNotExist(label));
+        }
+
       });
 
       this.questions = list;
@@ -90,6 +110,28 @@ export class ManageQuestionsComponent implements OnInit {
       c.text = this.cleanUp(c.text);
     });
 
+
+    let foundTags = this.question.tags.filter(x => x.key === QUIZ_FILTER_TAG);
+
+    if (foundTags.length === 1 && this.question.quizFilterTags.length === 0) {
+      // Remove QUIZ_FILTER_TAG.
+      this.question.tags = this.question.tags.filter(x => x.key !== QUIZ_FILTER_TAG);
+    }
+
+    if (foundTags.length === 0 && this.question.quizFilterTags.length > 0) {
+      // Add QUIZ_FILTER_TAG.
+      let myTag = new MyTag();
+      myTag.key = QUIZ_FILTER_TAG;
+      myTag.value = this.question.quizFilterTags.join(",");
+      this.question.tags.push(myTag);
+    }
+
+    if (foundTags.length === 1 && this.question.quizFilterTags.length > 0) {
+      // Update QUIZ_FILTER_TAG.
+      let myTag = foundTags[0];
+      myTag.value = this.question.quizFilterTags.join(",");
+    }
+
     this.questionService.addOrUpdate(this.question).subscribe(o => {
 
       this.logger.logObject(o);
@@ -111,6 +153,11 @@ export class ManageQuestionsComponent implements OnInit {
   edit(question: MyQuestion): void {
     this.question = question;
     this.showAdd = true;
+  }
+
+  cancel(): void {
+    this.showAdd = false;
+    this.reload();
   }
 
   remove(question: MyQuestion): void {
@@ -197,5 +244,25 @@ export class ManageQuestionsComponent implements OnInit {
         alert(err);
       })
     }
+  }
+
+  addQuestionTag(label: string, fromDropdown: boolean): void {
+    if (label !== SELECTED_TAG && label !== "" && label !== null) {
+
+      let found = this.question.quizFilterTags.filter(x => x === label);
+      if (found.length === 0) {
+        this.question.quizFilterTags.push(label);
+      }
+
+      if (fromDropdown === true) {
+
+        let selectItem: any = document.getElementById("selectedTag");
+        selectItem.selectedIndex = 0;
+      }
+    }
+  }
+
+  removeQuestionTag(label: string): void {
+    this.question.quizFilterTags = this.question.quizFilterTags.filter(x => x !== label);
   }
 }
