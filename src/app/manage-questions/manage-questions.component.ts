@@ -75,9 +75,20 @@ export class ManageQuestionsComponent implements OnInit {
       alert(err);
     });
   }
+
+  private cleanUp(text: string): string {
+    text = text.replace(/"/g, "'");
+    return text.replace(/(?:\r\n|\r|\n)/g, " ");
+  }
+
   saveChanges(): void {
 
     this.isSaving = true;
+
+    this.question.text = this.cleanUp(this.question.text);
+    this.question.choices.forEach(c => {
+      c.text = this.cleanUp(c.text);
+    });
 
     this.questionService.addOrUpdate(this.question).subscribe(o => {
 
