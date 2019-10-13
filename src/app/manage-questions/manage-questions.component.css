@@ -10,6 +10,20 @@ table {
     width: 40%;
 }
 
-.tag{
+.tag {
+    margin-right: 10px;
+}
+
+.button-tag {
+    margin-right: 10px;
+}
+
+#question-tag-text {
+    width: 100px;
+    margin-right: 10px;
+}
+
+#or-label {
+    margin-left: 10px;
     margin-right: 10px;
 }
