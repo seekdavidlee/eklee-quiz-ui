@@ -96,20 +96,9 @@ export class ManageQuestionsComponent implements OnInit {
     });
   }
 
-  private cleanUp(text: string): string {
-    text = text.replace(/"/g, "'");
-    return text.replace(/(?:\r\n|\r|\n)/g, " ");
-  }
-
   saveChanges(): void {
 
     this.isSaving = true;
-
-    this.question.text = this.cleanUp(this.question.text);
-    this.question.choices.forEach(c => {
-      c.text = this.cleanUp(c.text);
-    });
-
 
     let foundTags = this.question.tags.filter(x => x.key === QUIZ_FILTER_TAG);
 
