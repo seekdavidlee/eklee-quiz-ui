@@ -87,10 +87,19 @@ export class TakeQuizComponent implements OnInit {
     let answer = new MyAnswer();
     answer.question = new MyQuestion();
     answer.question.id = question.id;
-    answer.question.text = question.text;
-    answer.question.choices = JSON.parse(question.choicesJson);
-    answer.question.explain = JSON.parse(question.explainJson);
     answer.question.tags = JSON.parse(question.tagsJson);
+
+    if (answer.question.isV2()) {
+      answer.question.text = window.atob(question.text);
+      answer.question.choices = JSON.parse(window.atob(question.choicesJson));
+      answer.question.explain = JSON.parse(window.atob(question.explainJson));
+    } else {
+      answer.question.text = question.text;
+      answer.question.choices = JSON.parse(question.choicesJson);
+      answer.question.explain = JSON.parse(question.explainJson);
+    }
+
+
 
     this.populateAnswers(answer);
     return answer;
@@ -173,7 +182,7 @@ export class TakeQuizComponent implements OnInit {
   end(): void {
 
     this.setAnswer();
-    
+
     this.score = this.answers.filter(x => {
 
       var rightAnswers = x.answers.filter((a) => {
