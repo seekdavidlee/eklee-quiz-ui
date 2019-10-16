@@ -10,6 +10,7 @@ import { LoggingService } from './logging.service';
 import { QueryParameter, Comparison } from '../models/query-parameter';
 import { Status } from '../models/status';
 import { DeleteQuestion } from '../models/delete-question';
+import { MyTag } from '../models/my-tag';
 
 const CREATE_OR_UPDATE_QUESTION_NAME: string = "createOrUpdateQuestion";
 const GET_MY_QUESTIONS: string = "getMyQuestions";
@@ -32,10 +33,15 @@ export class QuestionRepositoryService {
     question.id = myQuestion.id;
     question.owner = this.adalSvc.userInfo.userName;
     question.quizId = myQuestion.quizId;
-    question.text = myQuestion.text;
+    question.text = window.btoa(myQuestion.text);
+
+    if (myQuestion.isV2() === false) {
+      myQuestion.addV2();
+    }
+
     question.tagsJson = JSON.stringify(myQuestion.tags).replace(new RegExp('"', 'g'), "\\\"");
-    question.choicesJson = JSON.stringify(myQuestion.choices).replace(new RegExp('"', 'g'), "\\\"");
-    question.explainJson = JSON.stringify(myQuestion.explain).replace(new RegExp('"', 'g'), "\\\"");
+    question.choicesJson = window.btoa(JSON.stringify(myQuestion.choices));
+    question.explainJson = window.btoa(JSON.stringify(myQuestion.explain));
     return question;
   }
 
@@ -43,10 +49,20 @@ export class QuestionRepositoryService {
     let myQuestion = new MyQuestion();
     myQuestion.quizId = question.quizId;
     myQuestion.id = question.id;
-    myQuestion.text = question.text;
-    myQuestion.choices = JSON.parse(question.choicesJson);
-    myQuestion.explain = JSON.parse(question.explainJson);
+    
     myQuestion.tags = JSON.parse(question.tagsJson);
+
+    if (myQuestion.isV2()) {
+      myQuestion.text = window.atob(question.text);
+      myQuestion.choices = JSON.parse(window.atob(question.choicesJson));
+      myQuestion.explain = JSON.parse(window.atob(question.explainJson));
+    } else {
+      myQuestion.text = question.text;
+      myQuestion.choices = JSON.parse(question.choicesJson);
+      myQuestion.explain = JSON.parse(question.explainJson);
+    }
+
+
     return myQuestion;
   }
 
