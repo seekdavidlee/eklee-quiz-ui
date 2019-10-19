@@ -30,6 +30,11 @@ export class ManageQuizesComponent implements OnInit {
     });
   }
 
+  addQuiz(): void {
+    this.newQuiz();
+    this.showAddQuiz = true;
+  }
+
   newQuiz(): void {
     this.quiz = new MyQuiz();
     this.quiz.id = "@";
