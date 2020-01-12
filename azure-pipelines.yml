@@ -9,11 +9,17 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+- group: prod
+
 steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
+
+steps:
+- pwsh: ./deployment/configure.ps1 -ClientId $ClientId -TenantId $TenantId -Endpoint $Endpoint -ReadonlyEndpoint $ReadonlyEndpoint
 
 - script: |
     npm install -g @angular/cli
