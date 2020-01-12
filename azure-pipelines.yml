@@ -18,8 +18,8 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-steps:
 - pwsh: ./deployment/configure.ps1 -ClientId $ClientId -TenantId $TenantId -Endpoint $Endpoint -ReadonlyEndpoint $ReadonlyEndpoint
+  displayName: 'Configure environment.prod.ts'
 
 - script: |
     npm install -g @angular/cli
