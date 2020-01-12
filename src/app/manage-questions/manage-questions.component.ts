@@ -238,6 +238,10 @@ export class ManageQuestionsComponent implements OnInit {
   addQuestionTag(label: string, fromDropdown: boolean): void {
     if (label !== SELECTED_TAG && label !== "" && label !== null) {
 
+      if (!this.question.quizFilterTags) {
+        this.question.quizFilterTags = [];
+      }
+      
       let found = this.question.quizFilterTags.filter(x => x === label);
       if (found.length === 0) {
         this.question.quizFilterTags.push(label);
